@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - Blog Project{% endblock %}
+
+{% block content %}
+    <h2>{{ post.title }}</h2>
+    <p style="color: #777; font-size: 0.9em; margin-bottom: 2rem;">
+        By {{ post.author.username }} on {{ post.created_at|date:"F d, Y" }}
+        {% if post.updated_at != post.created_at %}
+            (Updated: {{ post.updated_at|date:"F d, Y" }})
+        {% endif %}
+    </p>
+    
+    <div style="line-height: 1.8; margin-bottom: 2rem;">
+        {{ post.content|linebreaks }}
+    </div>
+    
+    {% if user == post.author %}
+        <div style="border-top: 1px solid #ddd; padding-top: 1rem;">
+            <a href="{% url 'post_update' post.slug %}" class="btn">Edit Post</a>
+            <a href="{% url 'post_delete' post.slug %}" class="btn btn-danger">Delete Post</a>
+        </div>
+    {% endif %}
+    
+    <div style="margin-top: 2rem;">
+        <a href="{% url 'post_list' %}" class="btn">Back to All Posts</a>
+    </div>
+{% endblock %}
