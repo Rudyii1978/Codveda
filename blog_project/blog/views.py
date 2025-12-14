@@ -30,7 +30,14 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        form.instance.slug = slugify(form.instance.title)
+        base_slug = slugify(form.instance.title)
+        slug = base_slug
+        counter = 1
+        # Ensure slug uniqueness
+        while Post.objects.filter(slug=slug).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+        form.instance.slug = slug
         return super().form_valid(form)
 
 class PostUpdateView(LoginRequiredMixin, UpdateView):
@@ -44,7 +51,14 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
         return Post.objects.filter(author=self.request.user)
 
     def form_valid(self, form):
-        form.instance.slug = slugify(form.instance.title)
+        base_slug = slugify(form.instance.title)
+        slug = base_slug
+        counter = 1
+        # Ensure slug uniqueness (excluding current post)
+        while Post.objects.filter(slug=slug).exclude(pk=form.instance.pk).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+        form.instance.slug = slug
         return super().form_valid(form)
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
